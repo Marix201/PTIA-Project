@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Astraea, prototipo navegable</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+body{margin:0;font-family:'Figtree',system-ui,sans-serif}
+button,input,select{font-family:inherit}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #ffffff;outline-offset:2px}
+h1{margin:0 0 16px;font-size:24px;line-height:1.2;font-weight:700}
+h2{margin:20px 0 10px;font-size:17px;font-weight:700}
+p{margin:0}
+.card{background:#24232d;border-radius:14px;padding:14px 16px;margin-bottom:12px}
+.lbl{display:block;font-size:14px;font-weight:600;color:#f4f2fa;margin-bottom:8px}
+.sub{font-size:12px;font-weight:500;color:#b9b5c9;margin-left:4px}
+.hint{font-size:13px;color:#b9b5c9;line-height:1.45}
+.inp{width:100%;box-sizing:border-box;min-height:44px;background:#2e2d39;border:1px solid #4a4860;border-radius:10px;color:#f4f2fa;font-size:16px;padding:0 12px}
+.inp.bad{border-color:#f2a65a}
+.err{font-size:13px;color:#f2a65a;margin-top:6px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:44px;padding:0 14px;border-radius:22px;border:1px solid #4a4860;background:#2e2d39;color:#f4f2fa;font-size:14px;cursor:pointer}
+.chip.on{background:#a898f0;border-color:#a898f0;color:#17161d;font-weight:600}
+.scale{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+.num{padding:0;border-radius:12px;font-size:16px;font-weight:600}
+.btn{display:block;width:100%;min-height:48px;border-radius:24px;border:1px solid transparent;font-size:16px;font-weight:600;cursor:pointer}
+.btn.pri{background:#a898f0;color:#17161d}
+.btn.pri:disabled{opacity:.4;cursor:not-allowed}
+.btn.sec{background:transparent;color:#d9d3f7;border-color:#a898f0}
+.tabbar{display:flex;border-top:1px solid #34324a;background:#1d1c25}
+.tab{flex:1;min-height:60px;background:none;border:0;color:#b9b5c9;font-size:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer}
+.tab.on{color:#d3c9ff;font-weight:700}
+.bar{height:8px;border-radius:4px;background:#3a3850;overflow:hidden}
+.fill{height:100%;background:#a898f0;border-radius:4px}
+.acc{display:flex;justify-content:space-between;align-items:center;width:100%;min-height:48px;text-align:left;background:none;border:0;color:#f4f2fa;font-size:15px;font-weight:600;padding:0;cursor:pointer}
+.pill{display:inline-block;font-size:12px;font-weight:600;border-radius:12px;padding:4px 10px;background:#3a3850;color:#d9d3f7}
+.pill.warn{background:#4a3722;color:#f7c58f}
+.chk{display:flex;gap:12px;align-items:flex-start;font-size:14px;line-height:1.45;color:#f4f2fa}
+.chk input{width:24px;height:24px;margin:0;flex:none;accent-color:#a898f0}
+.toast{position:absolute;left:16px;right:16px;bottom:76px;background:#f4f2fa;color:#17161d;border-radius:12px;padding:12px 14px;font-size:14px;font-weight:500}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; overflow: hidden; background: #17161d; color: #f4f2fa; font-family: 'Figtree', system-ui, sans-serif">
+<main style="flex: 1; overflow-y: auto; padding: 28px 16px 20px">
+
+<sc-if value="{{ isWelcome }}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; flex-direction: column; gap: 20px; padding-top: 24px">
+<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#a898f0" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l2.4 7.1L22 12l-7.6 2.9L12 22l-2.4-7.1L2 12l7.6-2.9z"/></svg>
+<div>
+<h1 style="font-size: 34px; margin-bottom: 8px">Astraea</h1>
+<p class="hint" style="font-size: 16px">Registra tus síntomas y recibe una señal temprana de compatibilidad con endometriosis o adenomiosis, más un reporte para llevar a tu consulta.</p>
+</div>
+<div class="card">
+<p class="lbl">Antes de empezar</p>
+<p class="hint">Astraea no da diagnósticos y no reemplaza a un profesional de salud. En este prototipo nada se guarda ni se envía a ningún servidor.</p>
+</div>
+<label class="chk" for="consent">
+<input id="consent" type="checkbox" checked="{{ consent }}" onChange="{{ toggleConsent }}">
+<span>Entiendo que el resultado no es un diagnóstico y acepto que mis datos se usen para generar mi reporte.</span>
+</label>
+<button class="btn pri" disabled="{{ noConsent }}" onClick="{{ start }}">Comenzar</button>
+</div>
+</sc-if>
+
+<sc-if value="{{ isPerfil }}" hint-placeholder-val="{{ false }}">
+<div>
+<h1>Perfil de usuario</h1>
+<div class="card">
+<label class="lbl" for="fam">Antecedentes familiares</label>
+<select id="fam" class="inp" value="{{ fam }}" onChange="{{ setFam }}">
+<option value="">Selecciona una opción</option>
+<option value="no">Ningún familiar con endometriosis</option>
+<option value="si">Madre, hermana o hija con endometriosis</option>
+<option value="otro">Otro familiar con endometriosis</option>
+<option value="nose">No lo sé</option>
+</select>
+</div>
+<div class="card">
+<p class="lbl">Diagnósticos previos<span class="sub">puedes elegir varios</span></p>
+<div class="chips">
+<sc-for list="{{ dxChips }}" as="c" hint-placeholder-count="5">
+<button class="{{ c.cls }}" aria-pressed="{{ c.pressed }}" onClick="{{ c.pick }}">{{ c.label }}</button>
+</sc-for>
+</div>
+</div>
+<div class="card">
+<label class="lbl" for="ca">Biomarcadores o laboratorios<span class="sub">opcional</span></label>
+<input id="ca" class="inp" type="text" placeholder="Por ejemplo, CA-125 en U/mL" value="{{ ca125 }}" onChange="{{ setCa }}">
+<p class="hint" style="margin-top: 8px">Si no los tienes a la mano, puedes dejarlo vacío: Astraea funciona sin ellos.</p>
+</div>
+<div class="card">
+<label class="lbl" for="edad">Edad</label>
+<input id="edad" class="{{ edadCls }}" type="number" inputmode="numeric" placeholder="18 a 55" value="{{ edad }}" onChange="{{ setEdad }}">
+<sc-if value="{{ edadErr }}" hint-placeholder-val="{{ false }}"><p class="err">Escribe una edad entre 18 y 55 años.</p></sc-if>
+</div>
+<div class="card">
+<label class="lbl" for="men">Edad de tu primera menstruación</label>
+<input id="men" class="{{ menCls }}" type="number" inputmode="numeric" placeholder="8 a 18" value="{{ menarquia }}" onChange="{{ setMenarquia }}">
+<sc-if value="{{ menErr }}" hint-placeholder-val="{{ false }}"><p class="err">Escribe una edad entre 8 y 18 años.</p></sc-if>
+</div>
+<div class="card">
+<p class="lbl">Medicación actual<span class="sub">puedes elegir varias</span></p>
+<div class="chips">
+<sc-for list="{{ medChips }}" as="c" hint-placeholder-count="4">
+<button class="{{ c.cls }}" aria-pressed="{{ c.pressed }}" onClick="{{ c.pick }}">{{ c.label }}</button>
+</sc-for>
+</div>
+</div>
+<button class="btn pri" onClick="{{ savePerfil }}">Guardar perfil</button>
+</div>
+</sc-if>
+
+<sc-if value="{{ isAprende }}" hint-placeholder-val="{{ false }}">
+<div>
+<h1>¡Conoce tu cuerpo!</h1>
+<sc-for list="{{ lessons }}" as="l" hint-placeholder-count="4">
+<div class="card">
+<button class="acc" aria-expanded="{{ l.open }}" onClick="{{ l.toggle }}"><span>{{ l.title }}</span><span aria-hidden="true" style="font-size: 22px; color: #a898f0">{{ l.sign }}</span></button>
+<sc-if value="{{ l.open }}" hint-placeholder-val="{{ false }}"><p class="hint" style="font-size: 14px; margin-top: 8px; white-space: pre-line">{{ l.body }}</p></sc-if>
+</div>
+</sc-for>
+<p class="hint" style="margin-top: 8px">Fuentes: De Corte et al., 2025; de Kok et al., 2025. Contenido informativo, no es consejo médico.</p>
+</div>
+</sc-if>
+
+<sc-if value="{{ isRegistro }}" hint-placeholder-val="{{ false }}">
+<div>
+<h1>Registro diario</h1>
+<div class="card">
+<p class="lbl">Dolor: intensidad<span class="sub">0 es ninguno, 10 es el peor</span></p>
+<div class="scale">
+<sc-for list="{{ dolorBtns }}" as="n" hint-placeholder-count="11">
+<button class="{{ n.cls }}" aria-pressed="{{ n.pressed }}" onClick="{{ n.pick }}">{{ n.n }}</button>
+</sc-for>
+</div>
+</div>
+<div class="card">
+<p class="lbl">Dolor: ubicación</p>
+<div class="chips">
+<sc-for list="{{ ubicChips }}" as="c" hint-placeholder-count="4">
+<button class="{{ c.cls }}" aria-pressed="{{ c.pressed }}" onClick="{{ c.pick }}">{{ c.label }}</button>
+</sc-for>
+</div>
+<p class="lbl" style="margin-top: 16px">Dolor: tipo</p>
+<div class="chips">
+<sc-for list="{{ tipoChips }}" as="c" hint-placeholder-count="4">
+<button class="{{ c.cls }}" aria-pressed="{{ c.pressed }}" onClick="{{ c.pick }}">{{ c.label }}</button>
+</sc-for>
+</div>
+</div>
+<div class="card">
+<p class="lbl">¿Coincide con el periodo?</p>
+<div class="chips">
+<sc-for list="{{ perChips }}" as="c" hint-placeholder-count="2">
+<button class="{{ c.cls }}" aria-pressed="{{ c.pressed }}" onClick="{{ c.pick }}">{{ c.label }}</button>
+</sc-for>
+</div>
+</div>
+<div class="card">
+<p class="lbl">Sangrado del día</p>
+<div class="chips">
+<sc-for list="{{ sangChips }}" as="c" hint-placeholder-count="5">
+<button class="{{ c.cls }}" aria-pressed="{{ c.pressed }}" onClick="{{ c.pick }}">{{ c.label }}</button>
+</sc-for>
+</div>
+</div>
+<div class="card">
+<label class="lbl" for="fat">Fatiga o energía<span class="sub">{{ fatigaTxt }}</span></label>
+<input id="fat" type="range" min="0" max="10" step="1" value="{{ fatiga }}" onChange="{{ setFatiga }}" style="width: 100%; min-height: 44px; accent-color: #a898f0">
+<div style="display: flex; justify-content: space-between" class="hint"><span>Sin fatiga</span><span>Agotamiento total</span></div>
+</div>
+<div class="card">
+<p class="lbl">Síntomas digestivos o urinarios<span class="sub">puedes elegir varios</span></p>
+<div class="chips">
+<sc-for list="{{ giChips }}" as="c" hint-placeholder-count="5">
+<button class="{{ c.cls }}" aria-pressed="{{ c.pressed }}" onClick="{{ c.pick }}">{{ c.label }}</button>
+</sc-for>
+</div>
+</div>
+<button class="btn pri" onClick="{{ saveReg }}">Guardar registro de hoy</button>
+<p class="hint" style="text-align: center; margin-top: 10px">Registros guardados en esta sesión: {{ dias }}</p>
+</div>
+</sc-if>
+
+<sc-if value="{{ isResultados }}" hint-placeholder-val="{{ false }}">
+<div>
+<h1>Con base en tu registro acumulado</h1>
+<div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px">
+<span class="pill warn">Señal de alerta: alta</span>
+<span class="pill">Resultado de ejemplo (simulado)</span>
+</div>
+<div class="card">
+<div style="display: flex; justify-content: space-between; align-items: baseline"><p class="lbl" style="margin: 0">Endometriosis</p><p style="font-size: 32px; font-weight: 600; color: #d3c9ff">68 %</p></div>
+<div class="bar" style="margin: 8px 0"><div class="fill" style="width: 68%"></div></div>
+<p class="hint">Dolor cíclico y antecedente familiar</p>
+</div>
+<div class="card">
+<div style="display: flex; justify-content: space-between; align-items: baseline"><p class="lbl" style="margin: 0">Adenomiosis</p><p style="font-size: 32px; font-weight: 600; color: #d3c9ff">41 %</p></div>
+<div class="bar" style="margin: 8px 0"><div class="fill" style="width: 41%"></div></div>
+<p class="hint">Sangrado abundante</p>
+</div>
+<p class="hint">Las dos compatibilidades son independientes y no suman 100 %: ambas condiciones pueden presentarse a la vez.</p>
+<h2>Patrones detectados</h2>
+<div class="card">
+<p style="font-size: 14px">El dolor coincide con el periodo</p>
+<div class="bar" style="margin: 6px 0 14px"><div class="fill" style="width: 100%"></div></div>
+<p style="font-size: 14px">Antecedente familiar</p>
+<div class="bar" style="margin: 6px 0 14px"><div class="fill" style="width: 68%"></div></div>
+<p style="font-size: 14px">Días de sangrado abundante</p>
+<div class="bar" style="margin: 6px 0 0"><div class="fill" style="width: 50%"></div></div>
+</div>
+<p class="hint" style="margin-bottom: 16px">Este resultado no es un diagnóstico. Un resultado bajo no descarta la enfermedad.</p>
+<button class="btn pri" onClick="{{ goEstudios }}">¿Qué exigir a tu médico?</button>
+</div>
+</sc-if>
+
+<sc-if value="{{ isEstudios }}" hint-placeholder-val="{{ false }}">
+<div>
+<h1>¿Qué exigir a tu médico?</h1>
+<p class="hint" style="margin-bottom: 14px">Sugerencias para llevar a consulta. Deben ser revisadas por una profesional de salud.</p>
+<div class="card">
+<p class="lbl" style="margin-bottom: 4px">Ecografía de mapeo pélvico</p>
+<p class="hint">Estudio de imagen que busca signos de endometriosis y adenomiosis en la pelvis.</p>
+</div>
+<div class="card">
+<p class="lbl" style="margin-bottom: 4px">Resonancia magnética</p>
+<p class="hint">Imagen más detallada, útil cuando la ecografía no es suficiente.</p>
+</div>
+<div class="card">
+<p class="lbl" style="margin-bottom: 4px">Valoración con ginecólogo</p>
+<p class="hint">Lleva tu reporte para que el médico revise tus registros en conjunto.</p>
+</div>
+<h2>Reporte para tu consulta</h2>
+<div class="card">
+<p class="hint" style="font-size: 14px; line-height: 1.7; white-space: pre-line">Resumen de ejemplo
+Días registrados: 14
+Dolor medio 6, máximo 9
+Endometriosis 68 %, adenomiosis 41 %
+Patrones: dolor cíclico, antecedente familiar, sangrado abundante
+Este reporte no es un diagnóstico.</p>
+</div>
+<button class="btn sec" onClick="{{ download }}">Descargar tu reporte</button>
+<button class="btn sec" style="margin-top: 10px; border-color: #4a4860; color: #b9b5c9" onClick="{{ goResultados }}">Volver a mis resultados</button>
+</div>
+</sc-if>
+
+</main>
+
+<sc-if value="{{ toastOn }}" hint-placeholder-val="{{ false }}"><div class="toast" role="status">{{ toast }}</div></sc-if>
+
+<sc-if value="{{ showTabs }}" hint-placeholder-val="{{ true }}">
+<nav class="tabbar" aria-label="Secciones">
+<button class="{{ tabPerfil }}" aria-current="{{ curPerfil }}" onClick="{{ goPerfil }}">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></svg>
+<span>Perfil</span>
+</button>
+<button class="{{ tabAprende }}" aria-current="{{ curAprende }}" onClick="{{ goAprende }}">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 21V5"/></svg>
+<span>Aprende</span>
+</button>
+<button class="{{ tabRegistro }}" aria-current="{{ curRegistro }}" onClick="{{ goRegistro }}">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M8 3v4M16 3v4M4 11h16"/></svg>
+<span>Registro</span>
+</button>
+<button class="{{ tabResultados }}" aria-current="{{ curResultados }}" onClick="{{ goResultados }}">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+<span>Resultados</span>
+</button>
+</nav>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      screen: 'welcome', consent: false, open: -1, toast: '',
+      fam: '', dx: [], med: [], ca125: '', edad: '', menarquia: '',
+      dolor: null, ubic: [], tipo: [], per: '', sang: '', fatiga: 0, gi: [], dias: 0
+    };
+  }
+
+  renderVals() {
+    const s = this.state;
+    const go = (screen) => () => this.setState({ screen, toast: '' });
+    const say = (msg) => {
+      this.setState({ toast: msg });
+      setTimeout(() => this.setState({ toast: '' }), 2400);
+    };
+    const toggle = (key, v) => () => {
+      const a = this.state[key].slice();
+      const i = a.indexOf(v);
+      if (i >= 0) a.splice(i, 1); else a.push(v);
+      this.setState({ [key]: a });
+    };
+    const multi = (key, opts) => opts.map((o) => {
+      const on = s[key].indexOf(o) >= 0;
+      return { label: o, cls: on ? 'chip on' : 'chip', pressed: on, pick: toggle(key, o) };
+    });
+    const single = (key, opts) => opts.map((o) => {
+      const on = s[key] === o;
+      return { label: o, cls: on ? 'chip on' : 'chip', pressed: on, pick: () => this.setState({ [key]: o }) };
+    });
+    const range = (v, lo, hi) => v !== '' && (isNaN(Number(v)) || Number(v) < lo || Number(v) > hi);
+    const edadErr = range(s.edad, 18, 55);
+    const menErr = range(s.menarquia, 8, 18);
+
+    const lessons = [
+      { title: '¿Qué es el endometrio?', body: 'Es la capa de tejido que reviste el interior del útero. En cada ciclo menstrual se engruesa y, si no hay embarazo, se desprende con el periodo.' },
+      { title: 'Endometriosis vs adenomiosis', body: 'En la endometriosis, tejido parecido al endometrio crece fuera del útero. En la adenomiosis crece dentro de su pared muscular (el miometrio).\n\nComparten síntomas como dolor pélvico crónico, dolor menstrual intenso y sangrado abundante, y pueden presentarse a la vez en la misma persona.' },
+      { title: 'Síntomas a reconocer', body: 'Dolor pélvico crónico, dolor menstrual muy intenso, sangrado abundante y fatiga persistente. Que sean frecuentes no significa que sean normales: llevar un registro ayuda a mostrarlos con claridad en consulta.' },
+      { title: 'Por qué importa el diagnóstico temprano', body: 'El diagnóstico suele tardar entre 7 y 11 años. Mientras tanto, la enfermedad puede avanzar y aumentar el riesgo de infertilidad, de dolor crónico incapacitante y de necesitar cirugías más invasivas.' }
+    ].map((l, i) => ({
+      title: l.title, body: l.body, open: s.open === i, sign: s.open === i ? '–' : '+',
+      toggle: () => this.setState({ open: this.state.open === i ? -1 : i })
+    }));
+
+    const dolorBtns = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => ({
+      n, pressed: s.dolor === n, cls: s.dolor === n ? 'chip num on' : 'chip num',
+      pick: () => this.setState({ dolor: n })
+    }));
+
+    const t = s.screen;
+    const tabOf = (name) => (t === name || (name === 'resultados' && t === 'estudios')) ? 'tab on' : 'tab';
+    const curOf = (name) => (t === name || (name === 'resultados' && t === 'estudios')) ? 'page' : undefined;
+
+    return {
+      isWelcome: t === 'welcome', isPerfil: t === 'perfil', isAprende: t === 'aprende',
+      isRegistro: t === 'registro', isResultados: t === 'resultados', isEstudios: t === 'estudios',
+      showTabs: t !== 'welcome',
+      tabPerfil: tabOf('perfil'), tabAprende: tabOf('aprende'), tabRegistro: tabOf('registro'), tabResultados: tabOf('resultados'),
+      curPerfil: curOf('perfil'), curAprende: curOf('aprende'), curRegistro: curOf('registro'), curResultados: curOf('resultados'),
+      goPerfil: go('perfil'), goAprende: go('aprende'), goRegistro: go('registro'), goResultados: go('resultados'), goEstudios: go('estudios'),
+      consent: s.consent, noConsent: !s.consent,
+      toggleConsent: () => this.setState({ consent: !this.state.consent }),
+      start: () => { if (this.state.consent) this.setState({ screen: 'perfil' }); },
+      fam: s.fam, setFam: (e) => this.setState({ fam: e.target.value }),
+      dxChips: multi('dx', ['SOP', 'Miomas', 'Infertilidad', 'Enfermedad inflamatoria intestinal', 'Otro', 'Ninguno']),
+      medChips: multi('med', ['Hormonal', 'Antiinflamatorio', 'Analgésico', 'Ninguna']),
+      ca125: s.ca125, setCa: (e) => this.setState({ ca125: e.target.value }),
+      edad: s.edad, setEdad: (e) => this.setState({ edad: e.target.value }), edadErr, edadCls: edadErr ? 'inp bad' : 'inp',
+      menarquia: s.menarquia, setMenarquia: (e) => this.setState({ menarquia: e.target.value }), menErr, menCls: menErr ? 'inp bad' : 'inp',
+      savePerfil: () => {
+        if (edadErr || menErr) say('Revisa los campos marcados antes de guardar.');
+        else say('Perfil guardado (simulado).');
+      },
+      lessons, dolorBtns,
+      ubicChips: multi('ubic', ['Pélvico', 'Lumbar', 'Durante relaciones', 'Al evacuar']),
+      tipoChips: multi('tipo', ['Cólico', 'Punzante', 'Quemante', 'Sordo']),
+      perChips: single('per', ['Sí', 'No']),
+      sangChips: single('sang', ['Ninguno', 'Manchado', 'Leve', 'Moderado', 'Abundante']),
+      fatiga: s.fatiga, fatigaTxt: s.fatiga + ' de 10',
+      setFatiga: (e) => this.setState({ fatiga: Number(e.target.value) }),
+      giChips: multi('gi', ['Hinchazón', 'Diarrea o estreñimiento', 'Dolor al evacuar', 'Dolor al orinar', 'Urgencia urinaria']),
+      dias: s.dias,
+      saveReg: () => {
+        if (this.state.dolor === null) { say('Elige la intensidad del dolor para guardar.'); return; }
+        this.setState({ dias: this.state.dias + 1 });
+        say('Registro de hoy guardado (simulado).');
+      },
+      download: () => say('Descarga simulada: el PDF real llega con el MVP.'),
+      toast: s.toast, toastOn: s.toast !== ''
+    };
+  }
+}
+</script>
+</body>
+</html>

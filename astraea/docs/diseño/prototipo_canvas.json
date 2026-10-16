@@ -1,0 +1,15 @@
+{
+  "v": 3,
+  "createdOnFiles": {"v": 1, "at": "2026-10-11T20:30:00Z"},
+  "title": "Astraea – Prototipo de interfaz",
+  "launch": {"view": "focused", "file": "Main.dc.html"},
+  "pages": [],
+  "boards": {
+    "Main.dc.html": {"x": 0, "y": 0, "w": 390, "h": 844, "title": "Prototipo navegable", "is_interactive": true}
+  },
+  "order": ["Main.dc.html"],
+  "notes": {
+    "guia": {"x": 470, "y": 0, "w": 320, "maxH": 420, "fill": "purple", "text": "Cómo recorrerlo: acepta el aviso y toca Comenzar. Usa la barra inferior para ir entre Perfil, Aprende, Registro y Resultados.\n\nSimulado en este prototipo: el resultado (68 % y 41 % son un ejemplo), las sugerencias de estudios y la descarga del reporte. Los campos de Perfil y Registro sí responden y validan."}
+  },
+  "designSystems": []
+}
