@@ -6,14 +6,14 @@ que muestra el prototipo de interfaz; si se cambia uno, hay que cambiarlo en amb
 
 from __future__ import annotations
 
-# --- Perfil (se llena una vez) -------------------------------------------------
+# Perfil (se llena una vez)
 FAM_VALORES = ("no", "si", "otro", "nose")  # antecedentes familiares
 DX_PREVIOS = ("SOP", "Miomas", "Infertilidad", "Enfermedad inflamatoria intestinal", "Otro")
 MEDICACION = ("Hormonal", "Antiinflamatorio", "Analgésico")
 EDAD_RANGO = (18, 55)
 MENARQUIA_RANGO = (8, 18)
 
-# --- Registro diario (se llena cada día) --------------------------------------
+# Registro diario (se llena diario) 
 UBICACIONES = ("Pélvico", "Lumbar", "Durante relaciones", "Al evacuar")
 TIPOS_DOLOR = ("Cólico", "Punzante", "Quemante", "Sordo")
 SANGRADO = ("Ninguno", "Manchado", "Leve", "Moderado", "Abundante")  # 0 a 4
@@ -31,7 +31,7 @@ FATIGA_RANGO = (0, 10)
 MIN_DIAS = 7
 DIAS_RECOMENDADOS = 28
 
-# --- Variables que recibe el modelo (salida de features.py) --------------------
+
 FEATURES_PERFIL = [
     "fam_primer_grado",
     "fam_otro",
@@ -74,7 +74,7 @@ FEATURES = FEATURES_PERFIL + FEATURES_DIARIO
 
 TARGETS = ("y_alerta", "y_endo", "y_adeno")
 
-# Texto en lenguaje claro para "Patrones detectados" (pantalla de resultados)
+# pantalla de resultados
 TEXTO_FACTOR = {
     "fam_primer_grado": "Antecedente familiar",
     "fam_otro": "Otro familiar con endometriosis",
