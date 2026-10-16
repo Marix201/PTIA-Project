@@ -1,0 +1,13 @@
+[project]
+name = "astraea"
+version = "0.1.0"
+description = "Tamizaje temprano de endometriosis y adenomiosis mediante sintomas reportados por las usuarias"
+requires-python = ">=3.10"
+dependencies = ["numpy", "pandas", "scikit-learn", "joblib", "fastapi", "pydantic", "uvicorn"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src", "."]
+testpaths = ["tests"]
