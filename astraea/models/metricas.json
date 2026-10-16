@@ -1,0 +1,35 @@
+{
+  "y_alerta": {
+    "familia": "regresion_logistica",
+    "umbral": 0.6515,
+    "auc": 0.9458886912856993,
+    "sensibilidad": 0.8429752066115702,
+    "especificidad": 0.9177215189873418,
+    "f1": 0.8888888888888888,
+    "brier": 0.08713075650448726,
+    "ece": 0.03276141119766246,
+    "n_prueba": 400
+  },
+  "y_endo": {
+    "familia": "regresion_logistica",
+    "umbral": 0.5,
+    "auc": 0.9552690844140717,
+    "sensibilidad": 0.8220858895705522,
+    "especificidad": 0.9240506329113924,
+    "f1": 0.8507936507936508,
+    "brier": 0.08061455998122026,
+    "ece": 0.04106183499691316,
+    "n_prueba": 400
+  },
+  "y_adeno": {
+    "familia": "boosting",
+    "umbral": 0.5,
+    "auc": 0.9162901503327036,
+    "sensibilidad": 0.7375886524822695,
+    "especificidad": 0.915057915057915,
+    "f1": 0.7790262172284644,
+    "brier": 0.10915407888361806,
+    "ece": 0.052980065394335224,
+    "n_prueba": 400
+  }
+}
