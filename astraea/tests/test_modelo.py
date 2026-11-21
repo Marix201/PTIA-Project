@@ -43,3 +43,19 @@ def test_ece_perfecta():
     import numpy as np
 
     assert ece(np.array([0, 1]), np.array([0.0, 1.0])) == 0.0
+
+
+def test_umbral_por_etiqueta_en_el_modelo(resultado):
+    b = resultado.bundle
+    assert set(b["umbrales"]) == set(TARGETS)
+    assert b["umbrales"]["y_alerta"] == b["umbral_alerta"]
+    for t in TARGETS:
+        assert resultado.metricas[t]["umbral"] == b["umbrales"][t]
+
+
+def test_regla_combinada_medida(resultado):
+    r = resultado.regla
+    assert 0.0 <= r["sensibilidad"] <= 1.0 and 0.0 <= r["especificidad"] <= 1.0
+    assert set(r["proporcion_alta_por_grupo"]) == {"otra", "endo", "adeno", "ambas"}
+    # la regla es una disyunción: no puede detectar menos que la señal general sola
+    assert r["sensibilidad"] >= resultado.metricas["y_alerta"]["sensibilidad"]

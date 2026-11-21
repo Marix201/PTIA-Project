@@ -12,24 +12,40 @@
   },
   "y_endo": {
     "familia": "regresion_logistica",
-    "umbral": 0.5,
+    "umbral": 0.4748,
     "auc": 0.9552690844140717,
-    "sensibilidad": 0.8220858895705522,
-    "especificidad": 0.9240506329113924,
-    "f1": 0.8507936507936508,
+    "sensibilidad": 0.8282208588957055,
+    "especificidad": 0.919831223628692,
+    "f1": 0.8517350157728707,
     "brier": 0.08061455998122026,
     "ece": 0.04106183499691316,
     "n_prueba": 400
   },
   "y_adeno": {
     "familia": "boosting",
-    "umbral": 0.5,
+    "umbral": 0.349,
     "auc": 0.9162901503327036,
-    "sensibilidad": 0.7375886524822695,
-    "especificidad": 0.915057915057915,
-    "f1": 0.7790262172284644,
+    "sensibilidad": 0.851063829787234,
+    "especificidad": 0.8378378378378378,
+    "f1": 0.7920792079207921,
     "brier": 0.10915407888361806,
     "ece": 0.052980065394335224,
     "n_prueba": 400
+  },
+  "regla_combinada": {
+    "sensibilidad": 0.9256198347107438,
+    "especificidad": 0.7848101265822784,
+    "proporcion_alta_por_grupo": {
+      "adeno": 0.8987341772151899,
+      "ambas": 1.0,
+      "endo": 0.900990099009901,
+      "otra": 0.21518987341772153
+    },
+    "n_prueba": 400,
+    "umbrales": {
+      "y_alerta": 0.6515,
+      "y_endo": 0.4748,
+      "y_adeno": 0.349
+    }
   }
 }
