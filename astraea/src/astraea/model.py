@@ -10,7 +10,7 @@ Como son independientes, las dos compatibilidades no suman 100 % y pueden coexis
 from __future__ import annotations
 
 import hashlib
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any
 
 import joblib
@@ -26,6 +26,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.tree import DecisionTreeClassifier
 
+from .rules import nivel_alerta
 from .schema import FEATURES, FEATURES_PERFIL, TARGETS
 
 VERSION = "0.1.0"
@@ -123,6 +124,37 @@ class Resultado:
     bundle: dict[str, Any]
     comparacion: dict[str, pd.DataFrame]
     metricas: dict[str, dict[str, float]]
+    regla: dict[str, Any] = field(default_factory=dict)
+
+
+def particion(df: pd.DataFrame, seed: int = 42, test_size: float = 0.20) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Partición entrenamiento/prueba, estratificada por grupo. La usan `entrenar` y las figuras."""
+    return train_test_split(df, test_size=test_size, stratify=df["grupo"], random_state=seed)
+
+
+def evaluar_regla(test: pd.DataFrame, p: dict[str, np.ndarray], umbrales: dict[str, float]) -> dict[str, Any]:
+    """Sensibilidad y especificidad de la regla combinada de alerta (la que ve la usuaria).
+
+    Usa `rules.nivel_alerta` fila por fila para medir exactamente lo que hace el servicio.
+    La verdad de referencia es y_alerta (endometriosis o adenomiosis).
+    """
+    pred = np.array(
+        [
+            nivel_alerta(a, umbrales["y_alerta"], e, d, umbrales["y_endo"], umbrales["y_adeno"]) == "alta"
+            for a, e, d in zip(p["y_alerta"], p["y_endo"], p["y_adeno"])
+        ]
+    )
+    y = test["y_alerta"].to_numpy().astype(bool)
+    por_grupo = {
+        str(g): float(pred[(test["grupo"] == g).to_numpy()].mean()) for g in sorted(test["grupo"].unique())
+    }
+    return {
+        "sensibilidad": float((pred & y).sum() / max(y.sum(), 1)),
+        "especificidad": float((~pred & ~y).sum() / max((~y).sum(), 1)),
+        "proporcion_alta_por_grupo": por_grupo,
+        "n_prueba": int(len(test)),
+        "umbrales": {k: float(v) for k, v in umbrales.items()},
+    }
 
 
 def entrenar(
@@ -132,11 +164,11 @@ def entrenar(
     test_size: float = 0.20,
 ) -> Resultado:
     features = list(features or FEATURES)
-    train, test = train_test_split(df, test_size=test_size, stratify=df["grupo"], random_state=seed)
+    train, test = particion(df, seed, test_size)
     cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=seed)
 
     modelos, comparacion, metricas, familias = {}, {}, {}, {}
-    umbral_alerta = 0.5
+    umbrales, p_prueba = {}, {}
     for objetivo in TARGETS:
         Xtr, ytr = train[features], train[objetivo]
         Xte, yte = test[features], test[objetivo]
@@ -149,18 +181,20 @@ def entrenar(
         calibrado.fit(Xtr, ytr)
         modelos[objetivo] = calibrado
 
-        if objetivo == "y_alerta":
-            oof = cross_val_predict(
-                CalibratedClassifierCV(crear_modelo(mejor, seed), method="sigmoid", cv=5),
-                Xtr,
-                ytr,
-                cv=cv,
-                method="predict_proba",
-            )[:, 1]
-            umbral_alerta = elegir_umbral(ytr.to_numpy(), oof)
-        umbral = umbral_alerta if objetivo == "y_alerta" else 0.5
+        # Umbral por sensibilidad objetivo para cada etiqueta, sobre predicciones fuera de muestra
+        # del entrenamiento (el conjunto de prueba no interviene en la elección).
+        oof = cross_val_predict(
+            CalibratedClassifierCV(crear_modelo(mejor, seed), method="sigmoid", cv=5),
+            Xtr,
+            ytr,
+            cv=cv,
+            method="predict_proba",
+        )[:, 1]
+        umbral = elegir_umbral(ytr.to_numpy(), oof)
+        umbrales[objetivo] = umbral
 
         p = calibrado.predict_proba(Xte)[:, 1]
+        p_prueba[objetivo] = p
         sens, espec = sens_espec(yte.to_numpy(), p, umbral)
         metricas[objetivo] = {
             "familia": mejor,
@@ -174,11 +208,15 @@ def entrenar(
             "n_prueba": int(len(yte)),
         }
 
+    umbral_alerta = umbrales["y_alerta"]
+    regla = evaluar_regla(test, p_prueba, umbrales)
+
     bundle = {
         "version": VERSION,
         "features": features,
         "modelos": modelos,
         "umbral_alerta": umbral_alerta,
+        "umbrales": umbrales,
         "medianas": train[features].median().to_dict(),
         "metricas": metricas,
         "semilla": seed,
@@ -188,7 +226,7 @@ def entrenar(
             "huella": hashlib.sha256(pd.util.hash_pandas_object(df[features], index=False).values.tobytes()).hexdigest()[:16],
         },
     }
-    return Resultado(bundle=bundle, comparacion=comparacion, metricas=metricas)
+    return Resultado(bundle=bundle, comparacion=comparacion, metricas=metricas, regla=regla)
 
 
 def ablacion(df: pd.DataFrame, seed: int = 42) -> pd.DataFrame:

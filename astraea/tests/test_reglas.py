@@ -22,3 +22,14 @@ def test_estudios_segun_compatibilidad():
         "ecografia_mapeo_pelvico", "resonancia_magnetica", "valoracion_ginecologica"
     ]
     assert estudios_sugeridos("alta", 0.1, 0.8) == ["resonancia_magnetica", "valoracion_ginecologica"]
+
+
+def test_umbral_propio_de_cada_compatibilidad():
+    # 0,40 no alcanza el 0,5 por defecto, pero sí un umbral de adenomiosis de 0,35
+    assert nivel_alerta(0.2, 0.65, p_endo=0.1, p_adeno=0.4) == "baja"
+    assert nivel_alerta(0.2, 0.65, p_endo=0.1, p_adeno=0.4, umbral_adeno=0.35) == "alta"
+    assert nivel_alerta(0.2, 0.65, p_endo=0.48, p_adeno=0.1, umbral_endo=0.475) == "alta"
+
+
+def test_estudios_usan_los_umbrales_entregados():
+    assert estudios_sugeridos("alta", 0.1, 0.4, umbral_adeno=0.35) == ["resonancia_magnetica", "valoracion_ginecologica"]

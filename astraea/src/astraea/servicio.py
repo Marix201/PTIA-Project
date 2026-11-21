@@ -14,7 +14,9 @@ def evaluar(
 ) -> dict[str, Any]:
     vector = construir_vector(perfil, registros)
     p = predecir(bundle, vector)
-    nivel = nivel_alerta(p["y_alerta"], bundle["umbral_alerta"], p["y_endo"], p["y_adeno"])
+    u = bundle.get("umbrales", {})  # modelos antiguos sin umbrales por etiqueta usan 0,5
+    u_endo, u_adeno = u.get("y_endo", 0.5), u.get("y_adeno", 0.5)
+    nivel = nivel_alerta(p["y_alerta"], bundle["umbral_alerta"], p["y_endo"], p["y_adeno"], u_endo, u_adeno)
     respuesta: dict[str, Any] = {
         "alerta": {"nivel": nivel, "puntaje": round(p["y_alerta"], 3)},
         "compatibilidad": {
@@ -22,7 +24,7 @@ def evaluar(
             "adenomiosis": round(p["y_adeno"], 3),
         },
         "patrones": factores_principales(bundle, vector, k=3),
-        "estudios_sugeridos": estudios_sugeridos(nivel, p["y_endo"], p["y_adeno"]),
+        "estudios_sugeridos": estudios_sugeridos(nivel, p["y_endo"], p["y_adeno"], u_endo, u_adeno),
         "aviso": AVISO,
         "reglas_revisadas_por_profesional": False,
         "entrenado_con_datos_sinteticos": bool(bundle["datos"]["sinteticos"]),
