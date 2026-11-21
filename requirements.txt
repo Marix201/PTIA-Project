@@ -10,3 +10,5 @@ pytest==9.1.1
 httpx==0.28.1
 # tablas Markdown en el reporte de resultados
 tabulate==0.10.0
+# figuras (scripts/figuras_metricas.py, scripts/comparar_datos_reales.py)
+matplotlib==3.11.2
