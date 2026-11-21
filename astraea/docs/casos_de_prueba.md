@@ -1,6 +1,6 @@
 # Casos de prueba del MVP
 
-Dos casos de punta a punta con pacientes simuladas (semilla 7) y un caso de validación. Se corrieron con `scripts/demo_evaluar.py` y con la API (`POST /evaluar`) sobre el commit `83ec986` de `develop`, con las 21 pruebas automáticas en verde.
+Dos casos de punta a punta con pacientes simuladas (semilla 7) y un caso de validación. Se corrieron con `scripts/demo_evaluar.py` y con la API (`POST /evaluar`) sobre el commit `83ec986` de `develop`, con las 36 pruebas automáticas en verde.
 
 Reproducir (desde `astraea/`):
 
