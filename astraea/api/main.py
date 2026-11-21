@@ -6,6 +6,8 @@ from pathlib import Path
 from typing import Literal, Optional
 
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import RedirectResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from astraea.model import cargar
@@ -74,3 +76,11 @@ def post_evaluar(solicitud: Solicitud):
     perfil = solicitud.perfil.model_dump()
     registros = [r.model_dump() for r in solicitud.registros]
     return evaluar(_bundle(str(ruta)), perfil, registros)
+
+
+@app.get("/", include_in_schema=False)
+def inicio():
+    return RedirectResponse("/app/")
+
+
+app.mount("/app", StaticFiles(directory=str(RAIZ / "web"), html=True), name="app")
