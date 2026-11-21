@@ -13,19 +13,24 @@
 | `src/astraea/servicio.py`, `api/main.py` | Flujo completo y API FastAPI | 6d |
 | `tests/` | 21 pruebas con pytest | Hito 3, casos de prueba |
 
-## Librerías (versiones con las que se probó)
+## Librerías (versiones instaladas con las que se probó)
+
+Versiones verificadas el 20 de noviembre de 2026 en un entorno nuevo creado con `pip install -r requirements.txt`. Con ellas pasan las 21 pruebas (`pytest`) y se reproducen las métricas de `models/metricas.json` (AUC de alerta 0,946; sensibilidad 0,843).
 
 | Librería | Versión | Uso |
 | --- | --- | --- |
-| Python | 3.13 | Lenguaje |
-| NumPy | 2.5.3 | Cálculo numérico y simulación |
-| pandas | 3.0.5 | Tablas de datos |
+| Python | 3.13.18 | Lenguaje |
+| NumPy | 2.5.5 | Cálculo numérico y simulación |
+| pandas | 3.1.1 | Tablas de datos |
 | scikit-learn | 1.9.1 | Modelos, validación cruzada, calibración, métricas |
 | joblib | 1.6.0 | Guardar el modelo |
-| FastAPI | 0.143.0 | API |
-| pydantic | 2.13.5 | Validación de entradas |
-| uvicorn | 0.53.0 | Servidor |
-| pytest, httpx | 9.1.1, 0.28.1 | Pruebas |
+| FastAPI | 0.165.0 | API |
+| pydantic | 2.14.4 | Validación de entradas |
+| uvicorn | 0.54.0 | Servidor |
+| pytest, httpx | 9.2.0, 0.28.1 | Pruebas |
+| tabulate | 0.10.0 | Tablas Markdown en el reporte de resultados (opcional) |
+
+Para volver a comprobarlas: `pip list` dentro del entorno virtual.
 
 
 ## Datos

@@ -6,8 +6,8 @@ requires-python = ">=3.10"
 dependencies = ["numpy", "pandas", "scikit-learn", "joblib", "fastapi", "pydantic", "uvicorn"]
 
 [tool.setuptools.packages.find]
-where = ["src"]
+where = ["astraea/src"]
 
 [tool.pytest.ini_options]
-pythonpath = ["src", "."]
-testpaths = ["tests"]
+pythonpath = ["astraea/src", "astraea"]
+testpaths = ["astraea/tests"]
