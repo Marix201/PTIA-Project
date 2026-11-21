@@ -76,6 +76,8 @@ permitidos (responde 422 si no cumplen) y responde 503 si no hay modelo entrenad
 
 ## Estructura
 
+El diagrama de arquitectura y el mapa de componentes con enlaces a cada archivo están en [`astraea/docs/arquitectura.md`](astraea/docs/arquitectura.md).
+
 Las rutas son relativas a `astraea/`. En la raíz del repositorio solo están `README.md`, `requirements.txt`, `pyproject.toml` y `.gitignore`.
 
 ```
