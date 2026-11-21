@@ -28,6 +28,7 @@
 - La interfaz ya no usa valores fijos: envía el perfil y el registro a `POST /evaluar` y muestra la respuesta del modelo.
 - La API sirve la interfaz en `/app`, de modo que se abre desde el mismo servidor.
 - Se agregó un botón para cargar días de ejemplo y poder probar el flujo sin registrar cada día a mano.
+- El reporte para la consulta se descarga como PDF desde la interfaz (`POST /reporte`, generado con ReportLab).
 - Las sugerencias de estudios y los patrones detectados salen de la respuesta de la API.
 
 ## Lo real y lo simulado
