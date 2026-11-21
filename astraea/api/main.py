@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Literal, Optional
 
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
@@ -21,6 +21,7 @@ from astraea.schema import (
     TIPOS_DOLOR,
     UBICACIONES,
 )
+from astraea.reporte import generar_pdf
 from astraea.servicio import evaluar
 
 RAIZ = Path(__file__).resolve().parent.parent
@@ -76,6 +77,17 @@ def post_evaluar(solicitud: Solicitud):
     perfil = solicitud.perfil.model_dump()
     registros = [r.model_dump() for r in solicitud.registros]
     return evaluar(_bundle(str(ruta)), perfil, registros)
+
+
+@app.post("/reporte")
+def post_reporte(solicitud: Solicitud):
+    ruta = ruta_modelo()
+    if not ruta.exists():
+        raise HTTPException(503, "No hay modelo entrenado. Ejecuta: python scripts/entrenar.py")
+    perfil = solicitud.perfil.model_dump()
+    registros = [r.model_dump() for r in solicitud.registros]
+    pdf = generar_pdf(evaluar(_bundle(str(ruta)), perfil, registros), registros)
+    return Response(pdf, media_type="application/pdf", headers={"Content-Disposition": 'attachment; filename="reporte_astraea.pdf"'})
 
 
 @app.get("/", include_in_schema=False)
