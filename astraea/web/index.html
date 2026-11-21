@@ -133,6 +133,17 @@ const A = {
       S.resultado = await r.json();
     }catch(e){ S.error = e.message || "No se pudo contactar la API."; }
     S.cargando=false; render();
+  },
+  async descargarPDF(){
+    try{
+      const r = await fetch("/reporte", {method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({perfil: perfilPayload(), registros: S.registros})});
+      if(!r.ok) throw new Error("La API respondió " + r.status);
+      const url = URL.createObjectURL(await r.blob());
+      const enlace = document.createElement("a");
+      enlace.href = url; enlace.download = "reporte_astraea.pdf"; enlace.click();
+      URL.revokeObjectURL(url);
+    }catch(e){ avisar("No se pudo generar el PDF."); }
   }
 };
 
@@ -286,6 +297,7 @@ function pantallaEstudios(){
 <p class="hint" style="margin-bottom:14px">Sugerencias para llevar a consulta.${r.reglas_revisadas_por_profesional?"":" Estas reglas todavía no han sido revisadas por una profesional de salud."}</p>
 ${tarjetas}<h2>Reporte para tu consulta</h2>
 <div class="card"><p class="hint" style="font-size:14px;line-height:1.7;white-space:pre-line">${esc(reporte)}</p></div>
+<button class="btn pri" style="margin-bottom:10px" onclick="A.descargarPDF()">Descargar reporte en PDF</button>
 <button class="btn sec" onclick="A.ir('resultados')">Volver a mis resultados</button></div>`;
 }
 

@@ -5,6 +5,7 @@ joblib==1.6.0
 fastapi==0.143.3
 pydantic==2.14.1
 uvicorn==0.54.0
+reportlab==5.1.0
 # pruebas
 pytest==9.1.1
 httpx==0.28.1
