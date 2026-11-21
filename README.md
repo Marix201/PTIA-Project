@@ -32,13 +32,24 @@ pip install -r requirements.txt
 
 ## Uso
 
+El código vive en la carpeta `astraea/`, así que los comandos se ejecutan desde ahí (con el entorno virtual activado):
+
 ```bash
+cd astraea
 python scripts/generar_datos.py 2000 42   # crea data/sintetico.csv
 python scripts/entrenar.py                # entrena, guarda models/modelo.joblib y docs/RESULTADOS_PRELIMINARES.md
 python scripts/demo_evaluar.py endo 7     # evalúa una paciente simulada (otra | endo | adeno | ambas)
-uvicorn api.main:app --reload             # API en http://127.0.0.1:8000/docs
+PYTHONPATH=src uvicorn api.main:app --reload   # API en http://127.0.0.1:8000/docs
 pytest                                    # 21 pruebas
 ```
+
+En Windows (PowerShell), la línea de la API es:
+
+```powershell
+$env:PYTHONPATH = "src"; uvicorn api.main:app --reload
+```
+
+`PYTHONPATH=src` hace falta porque el paquete `astraea` no está instalado; los scripts y `pytest` ya agregan `src/` por su cuenta, `uvicorn` no.
 
 `entrenar.py` tarda aproximadamente un minuto.
 
@@ -64,6 +75,8 @@ Las dos compatibilidades son independientes y no suman 100 %. La API valida rang
 permitidos (responde 422 si no cumplen) y responde 503 si no hay modelo entrenado.
 
 ## Estructura
+
+Las rutas son relativas a `astraea/`. En la raíz del repositorio solo están `README.md`, `requirements.txt`, `pyproject.toml` y `.gitignore`.
 
 ```
 src/astraea/   schema, features, synthetic, model, explain, rules, servicio
