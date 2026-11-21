@@ -1,7 +1,7 @@
 # Resultados preliminares (datos SINTÉTICOS)
 
 Estas métricas miden si el pipeline recupera las asociaciones que el equipo asumió al generar los datos,
-no la capacidad clínica del modelo.
+no la capacidad clínica del modelo. No deben presentarse como evidencia clínica.
 
 Filas: 2000. Semilla: 42. Conjunto de prueba: 20 %, estratificado por grupo.
 
@@ -45,5 +45,5 @@ Filas: 2000. Semilla: 42. Conjunto de prueba: 20 %, estratificado por grupo.
 | configuración                             | familia             |   auc |   sensibilidad |   especificidad |
 |:------------------------------------------|:--------------------|------:|---------------:|----------------:|
 | solo perfil                               | regresion_logistica | 0.863 |          0.851 |           0.728 |
-| perfil y registro diario                  | regresion_logistica | 0.946 |          0.843 |           0.918 |
-| perfil y registro diario, sin laboratorio | regresion_logistica | 0.942 |          0.847 |           0.911 |
+| perfil + registro diario                  | regresion_logistica | 0.946 |          0.843 |           0.918 |
+| perfil + registro diario, sin laboratorio | regresion_logistica | 0.942 |          0.847 |           0.911 |

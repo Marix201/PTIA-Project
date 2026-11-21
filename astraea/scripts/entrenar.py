@@ -49,7 +49,7 @@ lineas += ["## Métricas en el conjunto de prueba (modelo elegido y calibrado)",
 met = pd.DataFrame(res.metricas).T.reset_index().rename(columns={"index": "etiqueta"})
 lineas += [tabla(met), ""]
 lineas += ["## Ablación sobre la señal de alerta", "", tabla(abl), ""]
-destino = _ruta.RAIZ / "docs" / "RESULTADOS_PRELIMINARES.md"
+destino = _ruta.RAIZ / "docs" / "resultados_preliminares.md"
 destino.write_text("\n".join(lineas), encoding="utf-8")
 
 print(met.round(3).to_string(index=False))
